@@ -1,18 +1,23 @@
-function mypls=pls_nipals(X,Y,Num_com,alfa,Mc)
+function mypls=pls_nipals(X,Y,Num_com,alpha,to_be_scaled)
 %%% this function only receive X, and Y (Not centered, Not scaled) and the numer of required
-%%% components and report T,P,Wstar,Q,U,B_pls, tsquared (if means for both),
+%%% components(optional) and report T,P,Wstar,Q,U,B_pls, tsquared,
 %%% T2_lim, SPE_lim_x, SPE_lim_y, SPE_x,spey, centering and scaling factors 
 
 %% Further Setting 
-        numInputs = nargin;
-        if numInputs>4
-        to_be_scaled=Mc.tobescaled;
-        else
-        to_be_scaled=1;
+       
+
+         if nargin<3
+            Num_com=size(X,2);
+         end
+
+          if nargin<4
+            alpha=0.95;
+          end
+
+        if nargin<5
+            to_be_scaled=1;
         end
-        if Num_com==0
-        Num_com=Num_Com_determination(X);
-        end
+       
 
 
 %%
@@ -20,8 +25,12 @@ function mypls=pls_nipals(X,Y,Num_com,alfa,Mc)
         Y_orining=Y;
         Cx=mean(X);Cy=mean(Y);
         Sx=std(X)+1e-16;Sy=std(Y)+1e-16;
-        X=(X-Cx)./(Sx);
-        Y=(Y-Cy)./(Sy);
+
+        if to_be_scaled
+                X=(X-Cx)./(Sx);
+                Y=(Y-Cy)./(Sy);
+        end
+
         Num_obs=size(X,1);
         K=size(X,2); %Num of X Variables
         M=size(Y,2); %Num of Y Variables
@@ -74,13 +83,13 @@ function mypls=pls_nipals(X,Y,Num_com,alfa,Mc)
             U(:,i)=unew;
             Q(:,i)=q1;
             % SPE_X
-            [SPE_x(:,i),SPE_lim_x(i),Rx(i)]=SPE_calculation(T, P,X_0,alfa);
+            [SPE_x(:,i),SPE_lim_x(i),Rx(i)]=SPE_calculation(T, P,X_0,alpha);
            
             % SPE_Y
-            [SPE_y(:,i),SPE_lim_y(i),Ry(i)]=SPE_calculation(T, Q,Y_0,alfa);
+            [SPE_y(:,i),SPE_lim_y(i),Ry(i)]=SPE_calculation(T, Q,Y_0,alpha);
 
             % Hotelling T2 Related Calculations
-            [tsquared(:,i), T2_lim(i),ellipse_radius(i)]=T2_calculations(T(:,1:i),i,Num_obs,alfa);
+            [tsquared(:,i), T2_lim(i),ellipse_radius(i)]=T2_calculations(T(:,1:i),i,Num_obs,alpha);
             
          
         end
@@ -129,16 +138,16 @@ function mypls=pls_nipals(X,Y,Num_com,alfa,Mc)
         mypls.Ytrain_normal=Y_orining;
         mypls.Xtrain_scaled=X_0;
         mypls.Ytrain_scaled=Y_0;
-        mypls.alfa=alfa;
+        mypls.alpha=alpha;
         mypls.Null_Space=Null_Space;
         mypls.Num_com=Num_com;
 
 
 end
 
-function [spe,spe_lim,Rsquare]=SPE_calculation(score, loading,Original_block,alfa)
+function [spe,spe_lim,Rsquare]=SPE_calculation(score, loading,Original_block,alpha)
 
-%%% receive score,loading, original block (scaled format) and alfa, and calculate the Error
+%%% receive score,loading, original block (scaled format) and alpha, and calculate the Error
 %%% and SPE and the SPE_lim as well as Rsquared
 
             X_hat=score*loading';
@@ -146,20 +155,19 @@ function [spe,spe_lim,Rsquare]=SPE_calculation(score, loading,Original_block,alf
             spe=sum(Error.*Error,2);
             m=mean(spe);
             v=var(spe);
-            spe_lim=v/(2*m)*chi2inv(alfa,2*m^2/v);
+            spe_lim=v/(2*m)*chi2inv(alpha,2*m^2/v);
 
             %Rsquared
             Rsquare=(1-var(Error)/var(Original_block));
              
 end
 
-function [tsquared, T2_lim,ellipse_radius]=T2_calculations(T,Num_com,Num_obs,alfa)
-
+function [tsquared, T2_lim,ellipse_radius]=T2_calculations(T,Num_com,Num_obs,alpha)
 %%% recieve Score Matrix, the current applied number of components,num of
-%%% observations and alfa and return all Hotelling T2 related calculations
+%%% observations and alpha and return all Hotelling T2 related calculations
 %%% including tsquared, T2_lim and ellipse_radius
             tsquared=sum((T./std(T)).^2,2);
-            T2_lim=(Num_com*(Num_obs^2-1))/(Num_obs*(Num_obs-Num_com))*finv(alfa,Num_com,(Num_obs-Num_com));
+            T2_lim=(Num_com*(Num_obs^2-1))/(Num_obs*(Num_obs-Num_com))*finv(alpha,Num_com,(Num_obs-Num_com));
             ellipse_radius=(T2_lim*std(T(:,Num_com))^2)^0.5;
 
 end

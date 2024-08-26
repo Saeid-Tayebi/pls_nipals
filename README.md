@@ -11,11 +11,11 @@ This project provides a set of tools for developing Partial Least Squares (PLS) 
   - Users can bypass the default scaling by setting the `CenterScale` parameter to `0`.
   
 - **Component Selection:**
-  - The number of components is automatically selected using the "eigenvalue less than one" rule, ensuring the model retains components that explain significant variance in the data.
+  - The number of components is automatically selected as the number of X variables allowing to monitor model performance metric (R squared) to make final decision about the required number of Components.
   - Users have the flexibility to specify a different number of components if desired.
   
 - **Model Framework:**
-  - The function accepts an alpha parameter ranging from 0 to 1 that defines the modeling framework within which the model is valid for prediction. A smaller alpha constrains the model's prediction framework but enhances accuracy for new observations. Conversely, a higher alpha allows for a broader range of observations within the model's scope, though it may increase the likelihood of less accurate predictions. 
+  - The function accepts an alpha parameter ranging from 0 to 1 that defines the modeling confidence limit framework within which the model is valid for prediction. A smaller alpha constrains the model's prediction framework but enhances accuracy for new observations. Conversely, a higher alpha allows for a broader range of observations within the model's scope, though it may increase the likelihood of less accurate predictions. 
   
 - **Model Outputs:**
   - The function outputs a structure that includes:

@@ -1,32 +1,70 @@
-function []=score_plot(model,a,b)
+function []=score_plot(model,score_axis,data_labeling_tr,new_data,data_labeling_new)
+    %%% receive pls with the required scores that need to be plotted
+    figure
 
-    %%% receive pls or pca model with the required scores that we want to
-    %%% plot and plot every thing with the ellips around them
+    if nargin<2
+        score_axis=[1,size(model.T,2)];
+    end
 
-        T=model.T;
-        Num_obs=size(T,1);
-        t1=T(:,a);
-        t2=T(:,b);
-        r1=model.ellipse_radius(a); 
-        r2=model.ellipse_radius(b);
-        
-        plot(t1,t2,'mh',LineWidth=1)
-        xlabel(['T _{' num2str(a) '} score'])
-        ylabel(['T_{ ' num2str(b) '} score'])
-        hold on
-%         for i=1:Num_obs         
-%             text(t1(i), t2(i), num2str(i),'HorizontalAlignment','center',VerticalAlignment='baseline',FontSize=13)
-%         end
-        
-        Center=[0 0];
-        [x,y]=ellisedata(r1,r2,Center);
+     if nargin<3
+        data_labeling_tr=1;
+    end
 
-        plot(x,y,'LineStyle','--','Color','black');
+    x_axis_score=score_axis(1);
+    y_axis_score=score_axis(2);
 
-        set(gca, 'LineWidth', 2, 'FontSize', 15);
-        
+    r1=model.ellipse_radius(x_axis_score); 
+    r2=model.ellipse_radius(y_axis_score);
+    Center=[0 0];
+    [x,y]=ellisedata(r1,r2,Center);
+    plot(x,y,'LineStyle','--','Color','black');
+    hold on
+    set(gca, 'LineWidth', 2, 'FontSize', 15);
 
-       
+    T=model.T;    
+    tx=T(:,x_axis_score);
+    ty=T(:,y_axis_score);
+
+    
+
+
+    plot(tx,ty,'kh',LineWidth=1)
+    xlabel(['T _{' num2str(x_axis_score) '} score'])
+    ylabel(['T_{ ' num2str(y_axis_score) '} score'])
+    title('Score Plot Distribution')
+     legend(['confidence limit (',num2str(model.alpha*100), '%)'],'Training Samples')
+    hold on
+
+    if data_labeling_tr
+         Num_obs=size(T,1);
+            for i=1:Num_obs         
+                text(tx(i), ty(i), num2str(i),'HorizontalAlignment','center',VerticalAlignment='baseline',FontSize=13)
+            end
+    end
+
+if nargin>3
+[~,T_score_new,~,~,~]=pls_evaluation(model,new_data);
+    tx_new=T_score_new(:,x_axis_score);
+    ty_new=T_score_new(:,y_axis_score);
+    
+    plot(tx_new,ty_new,'bh',LineWidth=2)
+    legend(['confidence limit (',num2str(model.alpha*100), '%)'],'Training Samples', 'New Samples')
+if nargin<5
+    data_labeling_new=1;
+end
+
+if data_labeling_new==1
+    
+     for i=1:size(new_data,1)         
+                text(tx_new(i), ty_new(i), num2str(i),'Color','red','HorizontalAlignment','center',VerticalAlignment='baseline',FontSize=13)
+    end
+
+end
+
+end
+
+
+            
 
     function [x,y]=ellisedata(r1,r2,Center)
 
