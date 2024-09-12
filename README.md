@@ -1,45 +1,64 @@
-# PLS Models with NIPALS Algorithm
+PLS Models with NIPALS Algorithm
+Overview
+This repository provides a comprehensive set of tools for developing Partial Least Squares (PLS) models using the NIPALS algorithm. It includes implementations in both MATLAB and Python, allowing users to choose the platform that best fits their needs. The tools support data preprocessing, component selection, model validation, and visualization.
 
-## Overview
+Features
+Data Preprocessing: Automatically centers and scales data for robustness. Users can opt-out by adjusting parameters.
+Component Selection: Automatically determines the number of components based on the data, with flexibility to specify a different number if needed.
+Model Framework: Includes an alpha parameter to define the prediction confidence limit, balancing between model accuracy and range.
+Model Outputs: Provides scores, loadings, Hotelling’s T², Squared Prediction Error (SPE), and additional metrics.
+Visualization: Tools for visualizing data distributions, scores, and model performance.
+Implementations
+MATLAB
+Location: matlab/
+Usage: Includes scripts for model training, evaluation, and plotting. Refer to the README in the matlab folder for specific instructions.
+Python
+Location: python/
+Usage: Provides a class-based and module-based implementation. The README in the python folder details the setup and usage.
+Example Usage
+MATLAB:
 
-This project provides a set of tools for developing Partial Least Squares (PLS) models using the NIPALS algorithm. The main function takes input datasets `X` (features) and `Y` (responses) to build a PLS model. The implementation includes options for data preprocessing, component selection, model validation, and comprehensive model outputs.
+matlab
+Copy code
+% Load your data
+X = your_X_data;
+Y = your_Y_data;
 
-## Features
+% Train the PLS model
+plsModel = pls_nipals(X, Y, NumComponents, CenterScale);
 
-- **Data Preprocessing:** 
-  - By default, the model centers and scales the data to improve the robustness and reliability of the PLS model.
-  - Users can bypass the default scaling by setting the `CenterScale` parameter to `0`.
-  
-- **Component Selection:**
-  - The number of components is automatically selected as the number of X variables allowing to monitor model performance metric (R squared) to make final decision about the required number of Components.
-  - Users have the flexibility to specify a different number of components if desired.
-  
-- **Model Framework:**
-  - The function accepts an alpha parameter ranging from 0 to 1 that defines the modeling confidence limit framework within which the model is valid for prediction. A smaller alpha constrains the model's prediction framework but enhances accuracy for new observations. Conversely, a higher alpha allows for a broader range of observations within the model's scope, though it may increase the likelihood of less accurate predictions. 
-  
-- **Model Outputs:**
-  - The function outputs a structure that includes:
-    - **Scores and Loadings**: Essential components of the PLS model.
-    - **Hotelling’s T²**: A multivariate metric that helps identify outliers.
-    - **SPE (Squared Prediction Error)**: Measures the difference between observed and predicted values.
-    - **SPE and T² Limits**: Set thresholds for identifying unusual data points.
-    - **Scaling and Centering Values**: Retained for future scaling of new data.
-    - **Additional Data**: Any other relevant model parameters that may be useful in subsequent analysis.
-  
-- **Additional Functions:**
-  - **Model Evaluation**: Functions that take the PLS model structure and new observation `X` data to calculate model parameters, allowing for the evaluation of new data against the existing model.
-  - **Plotting Functions**: Tools to visualize data distributions, score plots, and the SPE and Hotelling T² distributions, aiding in outlier detection and data cleaning.
+% Evaluate the model
+[T_score, Hoteling_T2, SPE] = pls_evaluation(plsModel, X_new);
+pls_ploting(plsModel, X_new);
+Python:
 
-## Usage
+python
+Copy code
+import numpy as np
+from pls_module import pls_nipals
+from pls_class import PLSClass
 
-### Model Training
+# Load your data
+X = np.array(your_X_data)
+Y = np.array(your_Y_data)
 
-Train a PLS model using the provided function:
+# Using module
+pls_model = pls_nipals(X, Y, Num_com=3, alpha=0.95)
+y_pre, T_score, Hoteling_T2, SPE_X, SPE_Y_pre = pls_evaluation(pls_model, X_test)
+visual_plot(pls_model, scores_plt, X_test)
 
-```matlab
-% Example code to train a PLS model
-X = [your_X_data]; % Replace with your X dataset
-Y = [your_Y_data]; % Replace with your Y dataset
-plsModel = pls_nipals(X, Y, NumComponents(optional),CenterScale(optional));
-[T_score,Hoteling T^2, SPE] = pls_evaluation(plsModel,X_new);
-[]=pls_ploting(plsModel,X_new(optional))
+# Using class
+my_pls_model = PLSClass()
+my_pls_model.train(X, Y, Num_com=3, alpha=0.95)
+y_pre, T_score, Hoteling_T2, SPE_X, SPE_Y_pre = my_pls_model.evaluation(X_test)
+my_pls_model.visual_plot(scores_plt, X_test)
+Installation
+Clone the repository and navigate to the respective matlab or python directory for setup instructions.
+
+bash
+Copy code
+git clone https://github.com/username/pls_models_nipals.git
+cd pls_models_nipals
+
+Acknowledgements
+The PLS model implementations are based on established methodologies and have been adapted for ease of use in MATLAB and Python environments.
