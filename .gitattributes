@@ -1,0 +1,5 @@
+# Specify that .m files should be counted as MATLAB code
+*.m linguist-language=MATLAB
+
+# Specify that .py files should be counted as Python code
+*.py linguist-language=Python
