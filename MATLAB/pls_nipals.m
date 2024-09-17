@@ -1,5 +1,5 @@
 function mypls=pls_nipals(X,Y,Num_com,alpha,to_be_scaled)
-%%% this function only receive X, and Y (Not centered, Not scaled) and the numer of required
+%%%  this function only receive X, and Y (Not centered, Not scaled) and the numer of required
 %%% components(optional) and report T,P,Wstar,Q,U,B_pls, tsquared,
 %%% T2_lim, SPE_lim_x, SPE_lim_y, SPE_x,spey, centering and scaling factors 
 
