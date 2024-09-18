@@ -1,4 +1,4 @@
-#%%
+
 import numpy as np
 from scipy.stats import chi2, f
 import plotly.graph_objects as go
@@ -7,34 +7,34 @@ from plotly.subplots import make_subplots
 class MyPls:
     def __init__(self):
         # Initialize attributes if needed
-        MyPls.T = None
-        MyPls.S = None
-        MyPls.P = None  
-        MyPls.u =None
-        MyPls.U =None
-        MyPls.Q =None
-        MyPls.Wstar =None
-        MyPls.B_pls =None
-        MyPls.x_hat_scaled = None
-        MyPls.y_fit_scaled = None  
-        MyPls.tsquared =None
-        MyPls.T2_lim=None
-        MyPls.ellipse_radius =None
-        MyPls.SPE_x =None
-        MyPls.SPE_lim_x =None
-        MyPls.SPE_y =None
-        MyPls.SPE_lim_y =None
-        MyPls.Rsquared =None
-        MyPls.covered_var =None
-        MyPls.x_scaling =None
-        MyPls.y_scaling =None
-        MyPls.Xtrain_normal =None
-        MyPls.Ytrain_normal =None
-        MyPls.Xtrain_scaled =None
-        MyPls.Ytrain_scaled =None
-        MyPls.alpha =None
-        MyPls.Null_Space =None
-        MyPls.Num_com =None
+        self.T = None
+        self.S = None
+        self.P = None
+        self.u =None
+        self.U =None
+        self.Q =None
+        self.Wstar =None
+        self.B_pls =None
+        self.x_hat_scaled = None
+        self.y_fit_scaled = None  
+        self.tsquared =None
+        self.T2_lim=None
+        self.ellipse_radius =None
+        self.SPE_x =None
+        self.SPE_lim_x =None
+        self.SPE_y =None
+        self.SPE_lim_y =None
+        self.Rsquared =None
+        self.covered_var =None
+        self.x_scaling =None
+        self.y_scaling =None
+        self.Xtrain_normal =None
+        self.Ytrain_normal =None
+        self.Xtrain_scaled =None
+        self.Ytrain_scaled =None
+        self.alpha =None
+        self.Null_Space =None
+        self.Num_com =None
 
     def train(self,X, Y, Num_com, alpha=0.95, to_be_scaled=1):
 
@@ -52,7 +52,7 @@ class MyPls:
         if to_be_scaled==1:
             X = (X - Cx) / Sx
             Y = (Y - Cy) / Sy
-
+        
 
         Num_obs = X.shape[0]
         K = X.shape[1]  # Num of X Variables

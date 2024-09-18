@@ -9,6 +9,7 @@ np.set_printoptions(precision=4)
 # Generating data
 Num_observation=30
 Number_variables=3
+Num_testing=10
 X =np.random.rand(Num_observation,Number_variables)
 Beta=np.array([3,2,1])
 Y=(X@Beta.T).reshape(-1,1)
@@ -16,7 +17,7 @@ Y=(X@Beta.T).reshape(-1,1)
 # Set parameters
 Num_com = 2             # Number of PLS components (=Number of X Variables)
 alpha = 0.95            # Confidence limit (=0.95)
-X_test=np.array([[0.9,0.1,0.2],[0.5 , 0.4 , 0.9]])
+X_test=np.random.rand(Num_testing,Number_variables)
 scores_plt=np.array([1,2])
 #%%
 # Model implementation as a Module
