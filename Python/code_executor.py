@@ -35,8 +35,9 @@ pls_m.visual_plot(pls_model,scores_plt,X_test,True,True) #
 MyPlsModel=pls_c()
 MyPlsModel.train(X,Y,Num_com,alpha)
 y_pre,T_score,Hotelin_T2,SPE_X,SPE_Y_pre=MyPlsModel.evaluation(X_test)
-MyPlsModel.visual_plot(scores_plt)
+MyPlsModel.visual_plot(scores_plt,X_test)
+
 
 print(f'Y_pre={y_pre}\n',f'T_score={T_score}\n',f'Hotelin_T2={Hotelin_T2}\n',f'SPE_X={SPE_X}\n',f'SPE_Y_pre={SPE_Y_pre}\n')
-
+input('')
 # %%
