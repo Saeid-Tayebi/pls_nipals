@@ -220,7 +220,7 @@ class MyPls:
         return X_new,Y_new
 
 
-    def visual_plot(self, score_axis=None, X_test=None, data_labeling=False, testing_labeling=False):
+    def visual_plot(self, score_axis=None, X_test=None,color_code_data=None, data_labeling=False, testing_labeling=False):
         def confidenceline(r1, r2, center):
                 t = np.linspace(0, 2 * np.pi, 100)  # Increase the number of points for a smoother ellipse
                 x = center[0] + r1 * np.cos(t)
@@ -263,7 +263,14 @@ class MyPls:
         xr, yr = confidenceline(r1, r2, np.array([0, 0]))
         label_str = f'Confidence Limit ({self.alpha * 100}%)'
         plt.plot(xr,yr,'k--',label=label_str)
-        plt.scatter(tscore_x, tscore_y, color='b', marker='o', s=50, label='Score (Training Dataset)')
+        if color_code_data is None:
+            plt.scatter(tscore_x, tscore_y, color='b', marker='o', s=50, label='Score (Training Dataset)')
+        else:
+            cmap = plt.get_cmap('viridis')
+            norm = plt.Normalize(vmin=min(color_code_data), vmax=max(color_code_data))  
+            plt.scatter(tscore_x,tscore_y,c=color_code_data, cmap='viridis',s=100,label='Scores(Training Dataset)')
+            plt.colorbar()
+        
 
         
         
