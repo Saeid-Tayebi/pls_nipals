@@ -100,10 +100,10 @@ def pls_nipals(X, Y, Num_com, alpha=0.95, to_be_scaled=1):
         U[:, i] = unew
         Q[:, i] = q1
         # SPE_X
-        SPE_x[:, i], SPE_lim_x[i], Rx[i] = SPE_calculation(T, P, X_0, alpha)
+        SPE_x[:, i], SPE_lim_x[i], Rx[i] = SPE_calculation(T, P, X_0, alpha,is_train=1)
 
         # SPE_Y
-        SPE_y[:, i], SPE_lim_y[i], Ry[i] = SPE_calculation(T, Q, Y_0, alpha)
+        SPE_y[:, i], SPE_lim_y[i], Ry[i] = SPE_calculation(T, Q, Y_0, alpha,is_train=1)
 
         # Hotelling T2 Related Calculations
         tsquared[:, i], T2_lim[i], ellipse_radius[i] = T2_calculations(T[:, :i+1], i+1, Num_obs, alpha)
@@ -176,16 +176,18 @@ def pls_evaluation(pls_model:PLS_structure,X_new):
   return y_pre,T_score,Hotelin_T2,SPE_X,SPE_Y
 
 
-def SPE_calculation(score, loading, Original_block, alpha):
+def SPE_calculation(score, loading, Original_block, alpha,is_train=0):
     # Calculation of SPE and limits
     X_hat = score @ loading.T
     Error = Original_block - X_hat
     #Error.reshape(-1,loading.shape[1])
     spe = np.sum(Error**2, axis=1)
-    m = np.mean(spe)
-    v = np.var(spe,ddof=1)
-    spe_lim = v / (2 * m) * chi2.ppf(alpha, 2 * m**2 / v)
-    Rsquare = 1 - np.var(Error,ddof=1) / np.var(Original_block,ddof=1) # not applicaple for pls vali
+    spe_lim, Rsquare=None,None
+    if is_train==1:
+        m = np.mean(spe)
+        v = np.var(spe,ddof=1)
+        spe_lim = v / (2 * m) * chi2.ppf(alpha, 2 * m**2 / (v+1e-15))
+        Rsquare = 1 - np.var(Error,ddof=1) / np.var(Original_block,ddof=1)
     return spe, spe_lim, Rsquare
 
 def T2_calculations(T, Num_com, Num_obs, alpha):
