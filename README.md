@@ -2,13 +2,16 @@
 
 ## Overview
 
-This repository provides a comprehensive set of tools for developing Partial Least Squares (PLS) models using the NIPALS algorithm. It includes implementations in both MATLAB and Python, allowing users to choose the platform that best fits their needs. The tools support data preprocessing, component selection, model validation, and visualization.
+This repository provides a comprehensive set of tools for developing Partial Least Squares (PLS) models using the NIPALS algorithm. It includes implementations in both MATLAB and Python, allowing users to choose the platform that best fits their needs. The tools support data preprocessing, component selection, model validation, and visualization, along with model inversion functionality for predicting input variables corresponding to a desired output.
 
 ## Features
 
 - **Data Preprocessing**: Automatically centers and scales data for robustness. Users can opt-out by adjusting parameters.
 - **Component Selection**: Automatically determines the number of components based on the data, with flexibility to specify a different number if needed.
-- **Model Framework**: Includes an alpha parameter to define the prediction confidence limit, balancing between model accuracy and range.
+- **Model Framework**: Includes an `alpha` parameter to define the prediction confidence limit, balancing between model accuracy and range.
+- **Model Inversion (MI)**: A method for calculating the input (`X_new`) corresponding to a desired output (`Y_des`). Offers two approaches:
+  - General PLS Model Inversion (`method=1`).
+  - A custom, user-suggested method (`method=2`).
 - **Model Outputs**: Provides scores, loadings, Hotelling’s T², Squared Prediction Error (SPE), and additional metrics.
 - **Visualization**: Tools for visualizing data distributions, scores, and model performance.
 
@@ -20,11 +23,11 @@ This repository provides a comprehensive set of tools for developing Partial Lea
 
 ### Python
 - **Location**: [python/](python/)
-- **Usage**: Provides a class-based and module-based implementation. The README in the `python` folder details the setup and usage.
+- **Usage**: Provides both class-based and module-based implementations. The README in the `python` folder details the setup and usage.
 
 ## Example Usage
 
-**MATLAB**:
+### **MATLAB**:
 ```matlab
 % Load your data
 X = your_X_data;
@@ -38,7 +41,7 @@ plsModel = pls_nipals(X, Y, NumComponents, CenterScale);
 pls_ploting(plsModel, X_new);
 ```
 
-**Python**:
+### **Python**:
 ```python
 import numpy as np
 from pls_module import pls_nipals
@@ -58,6 +61,13 @@ my_pls_model = PLSClass()
 my_pls_model.train(X, Y, Num_com=3, alpha=0.95)
 y_pre, T_score, Hoteling_T2, SPE_X, SPE_Y_pre = my_pls_model.evaluation(X_test)
 my_pls_model.visual_plot(scores_plt, X_test)
+
+# Model Inversion (MI)
+x_des, y_pre_MI = my_pls_model.MI(Y_des=Y_test[1, :].reshape(1, -1), method=1)
+print('General MI:', x_des, y_pre_MI)
+
+x_des, y_pre_MI = my_pls_model.MI(Y_des=Y_test[1, :].reshape(1, -1), method=2)
+print('Suggested MI:', x_des, y_pre_MI)
 ```
 
 ## Installation
@@ -71,4 +81,4 @@ cd pls_models_nipals
 
 ## Acknowledgements
 
-The PLS model implementations are based on established methodologies and have been adapted for ease of use in MATLAB and Python environments.
+The PLS model implementations are based on established methodologies and have been adapted for ease of use in MATLAB and Python environments. This repository also includes model inversion capabilities that provide flexibility in predicting new input data based on desired outputs.

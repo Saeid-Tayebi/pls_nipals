@@ -1,6 +1,9 @@
 import numpy as np
 from scipy.stats import chi2, f
 import matplotlib.pyplot as plt
+from MyPcaClass import MyPca as pca
+from sklearn.linear_model import LinearRegression
+
 
 class MyPls:
     def __init__(self):
@@ -37,7 +40,7 @@ class MyPls:
     def train(self,X, Y, Num_com=None, alpha=0.95, to_be_scaled=1):
 
         if Num_com is None: 
-            Num_com=X.shape[1]
+            Num_com=self.Num_components_sugg(X)
         if Num_com>(X.shape[0]-1):
             Num_com=X.shape[0]-1
         # Data Preparation
@@ -152,7 +155,26 @@ class MyPls:
         self.Num_com=Num_com
 
         return self
+    def Num_components_sugg(self,Z,ploting=False):
+        '''
+        Z can be either X or Y
+        determines the number of components that describe the data quite good using the eigenvalue_greater_than_one_rule
+        '''
+        pca_model=pca()
+        pca_model.train(Z)
+        eig_val=pca_model.covered_var
+        Num_com_sugg=np.sum(eig_val>1)
+        if ploting==True:
+            plt.figure()
+            plt.bar(range(1,eig_val.shape[1]+1),eig_val.reshape(-1),label='Covered Variance')
+            plt.xlabel('Components')
+            plt.ylabel('Variance Covered')
+            plt.plot([0,eig_val.shape[1]+1],[1,1],'k--',label='Threshold Line')
+            plt.legend()
+            plt.show()
+        # plot the eig_Val using barchart to show if suggested A is rational or not
 
+        return Num_com_sugg
     def evaluation(self,X_new):
         """
         receive pls model and new observation and calculate its
@@ -192,32 +214,71 @@ class MyPls:
         return tsquared, T2_lim, ellipse_radius
 
     def Y_fit_Calculation(self, X_new):
-        x_new_scaled,_ = self.scaler(X_new,0)
+        x_new_scaled,_ = self.scaler(X_new=X_new)
         y_fit_scaled = x_new_scaled @ self.B_pls
         T_score=x_new_scaled @ self.Wstar
-        _,y_fit = self.unscaler(0,y_fit_scaled)
+        _,y_fit = self.unscaler(Y_new=y_fit_scaled)
         return y_fit,T_score
+    def MI(self,Y_des,method=1):
+        '''
+        This method receives Y_des and calculate its corresponding X_new using the general PLS Model Inversion solution
+        if mode is 2 then it uses my suggested MI
+        '''
+        Wstar=self.Wstar
+        Q=self.Q
+        P=self.P
+        T=self.T
+        NS=self.Null_Space
+        __,Y_des_scled=self.scaler(Y_new=Y_des)
 
-    def scaler(self,X_new,Y_new):
-
-        Cx=self.x_scaling[0,:]
-        Sx=self.x_scaling[1,:]
-        X_new=(X_new-Cx)/Sx
-        #if not Y_new==0:
-        Cy=self.y_scaling[0,:]
-        Sy=self.y_scaling[1,:]
-        Y_new=(Y_new-Cy)/Sy
-        return X_new,Y_new
+        if method==1:
+            if NS==0:   # not direct answer
+                t_des=np.linalg.inv(Q.T @ Q) @ Q.T @ Y_des_scled.T
+            elif NS==1: # only One answer
+                t_des=np.linalg.inv(Q) @ Y_des_scled.T
+            elif NS==2: #NS exist
+                t_des= Q.T @ np.linalg.inv(Q @ Q.T) @ Y_des_scled.T
+            t_des=t_des.T
+        elif method==2: # My suggested MI
+            Y_pca=self.Ytrain_normal
+            T_pls=self.T
+            pca_num_com=np.min((Y_pca.shape[1],T_pls.shape[1]))
+            pca_model=pca()
+            pca_model.train(Y_pca,pca_num_com)
+            T_pca=pca_model.T
+            __,t_des_pca,__,__=pca_model.evaluation(Y_des)
+            regression_model = LinearRegression()
+            regression_model.fit(T_pca, T_pls)
+            t_des=regression_model.predict(t_des_pca)
+            
+        x_des_scaled= t_des @ P.T
+        x_des,__=self.unscaler(X_new=x_des_scaled)
+        y_pre,__=self.Y_fit_Calculation(x_des)
+        return x_des,y_pre    
+        
+    def scaler(self,X_new=None,Y_new=None):
+        X_new_scaled,Y_new_scaled=None,None
+        if X_new is not None:
+            Cx=self.x_scaling[0,:]
+            Sx=self.x_scaling[1,:]
+            X_new_scaled=(X_new-Cx)/Sx
+        if Y_new is not None:
+            Cy=self.y_scaling[0,:]
+            Sy=self.y_scaling[1,:]
+            Y_new_scaled=(Y_new-Cy)/Sy
+        return X_new_scaled,Y_new_scaled
     
-    def unscaler(self,X_new,Y_new):
-        Cx=self.x_scaling[0,:]
-        Sx=self.x_scaling[1,:]
-        X_new=(X_new * Sx) + Cx
-        #if not Y_new==0:
-        Cy=self.y_scaling[0,:]
-        Sy=self.y_scaling[1,:]
-        Y_new=(Y_new * Sy) + Cy
-        return X_new,Y_new
+    def unscaler(self,X_new=None,Y_new=None):
+        X_new_unscaled,Y_new_unscaled=None,None
+        if X_new is not None:
+            Cx=self.x_scaling[0,:]
+            Sx=self.x_scaling[1,:]
+            X_new_unscaled=(X_new * Sx) + Cx
+        if Y_new is not None:
+            Cy=self.y_scaling[0,:]
+            Sy=self.y_scaling[1,:]
+            Y_new_unscaled=(Y_new * Sy) + Cy
+        return X_new_unscaled,Y_new_unscaled
 
 
     def visual_plot(self, score_axis=None, X_test=None,color_code_data=None, data_labeling=False, testing_labeling=False):

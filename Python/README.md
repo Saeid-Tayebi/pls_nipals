@@ -1,6 +1,6 @@
 # PLS Model Development and Evaluation
 
-This project provides a set of tools for developing Partial Least Squares (PLS) models using the NIPALS algorithm. The PLS model is now available in both a class-based format and a module-based format, allowing users to choose the implementation that best suits their needs. The main functions take input datasets X (features) and Y (responses) to build a PLS model. The implementation includes options for data preprocessing, component selection, model validation, and comprehensive model outputs.
+This project provides a set of tools for developing Partial Least Squares (PLS) models using the NIPALS algorithm. The PLS model is now available in both a class-based format and a module-based format, allowing users to choose the implementation that best suits their needs. The main functions take input datasets `X` (features) and `Y` (responses) to build a PLS model. The implementation includes options for data preprocessing, component selection, model validation, and comprehensive model outputs.
 
 ## Features
 
@@ -14,6 +14,11 @@ This project provides a set of tools for developing Partial Least Squares (PLS) 
 
 ### Model Framework:
 - The function accepts an `alpha` parameter ranging from 0 to 1 that defines the modeling confidence limit framework within which the model is valid for prediction. A smaller `alpha` constrains the model's prediction framework but enhances accuracy for new observations. Conversely, a higher `alpha` allows for a broader range of observations within the model's scope, though it may increase the likelihood of less accurate predictions.
+
+### Model Inversion (MI):
+- The **`MI`** method allows users to calculate the corresponding `X_new` based on a desired `Y_des`. This is useful for determining the necessary input values to achieve a given output.
+  - **Method 1**: Implements the general PLS Model Inversion solution.
+  - **Method 2**: Uses a suggested alternative inversion method for potentially improved performance.
 
 ### Model Outputs:
 - The function outputs a structure that includes:
@@ -76,4 +81,14 @@ y_pre, T_score, Hotelin_T2, SPE_X, SPE_Y_pre = MyPlsModel.evaluation(X_test)
 MyPlsModel.visual_plot(scores_plt, X_test)
 
 print(f'Y_pre={y_pre}\n', f'T_score={T_score}\n', f'Hotelin_T2={Hotelin_T2}\n', f'SPE_X={SPE_X}\n', f'SPE_Y_pre={SPE_Y_pre}\n')
+
+# Model Inversion (MI) Example
+Y_test = your_Y_test_data  # Replace with your Y test data
+
+# Apply Model Inversion to obtain X_new for a desired Y
+x_des, y_pre_MI = MyPlsModel.MI(Y_des=Y_test[1, :].reshape(1, -1), method=1)
+print('Original MI:', x_des, y_pre_MI, Y_test[1, :])
+
+x_des, y_pre_MI = MyPlsModel.MI(Y_des=Y_test[1, :].reshape(1, -1), method=2)
+print('Suggested MI:', x_des, y_pre_MI, Y_test[1, :])
 ```
