@@ -50,4 +50,16 @@ x_des,y_pre_MI=MyPlsModel.MI(Y_des=Y_test[1,:].reshape(1,-1),method=1)
 print('org MI',x_des,y_pre_MI,Y_test[1,:])
 x_des,y_pre_MI=MyPlsModel.MI(Y_des=Y_test[1,:].reshape(1,-1),method=2)
 print('Sug MI',x_des,y_pre_MI,Y_test[1,:])
+#%% PLS Null Space checking
+
+MyPlsModel=pls_c()
+MyPlsModel.train(X,Y,Num_com=3,alpha=alpha)
+NS_t,NS_X,NS_Y=MyPlsModel.NS_all(Y_des=Y[1,:].reshape(1,-1),MI_method=1)
+MyPlsModel.visual_plot(X_test=NS_X)
+
+NS_t,NS_X,NS_Y=MyPlsModel.NS_single(which_col=1,Num_point=1000,Y_des=Y[1,:].reshape(1,-1),MI_method=1)
+MyPlsModel.visual_plot(X_test=NS_X)
+
+NS_t,NS_X,NS_Y=MyPlsModel.NS_XtoY(which_col=2,Num_point=1000,Y_des=Y[1,:].reshape(1,-1),MI_method=1)
+MyPlsModel.visual_plot(X_test=NS_X)
 # %%
