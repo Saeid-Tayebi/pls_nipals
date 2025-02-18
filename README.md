@@ -26,7 +26,7 @@ project/
 ├── tests/                   # Test cases for PLS functionality
 │   ├── test_pls.py          # Unit tests for PLSClass
 │   └── refrence_model/      # Reference implementation (e.g.,sklearn PLS)
-│   └── PLS_MATLAB/          # MATLAB implementation (if needed)
+├── PLS_MATLAB/              # MATLAB implementation (if needed)
 ├── requirements.txt         # Python dependencies
 ├── LICENSE                  # Project license
 └── README.md                # This file
